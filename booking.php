@@ -6,8 +6,13 @@ $services = [
 ];
 
 // Read the selected service from $_GET.
-$servicekey = $_GET['service'];
+$servicekey = $_GET['service'] ?? '';
 // Use isset() to redirect when the key is missing or not in $services.
+if (!isset($services[$servicekey])) {
+    header('Location: services.php');
+    exit;
+}
+$serviceName = $services[$servicekey];
 // When the request method is POST, read the owner and pet names.
 
 ?>
@@ -26,10 +31,19 @@ $servicekey = $_GET['service'];
         <h1>Request Pet Care</h1>
 
         <!-- Display the selected service name with htmlspecialchars(). -->
-
+         <?php if ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
+            <h2>Raw POST data</h2>
+            <pre><?php var_dump($_POST); ?></pre>
+            <a class="btn btn-secondary" href="newsletter.php">Back to form</a>
+        <?php else: ?>
         <!-- On POST, display a designed request summary. -->
-
+            <p>You are requesting <strong><?= htmlspecialchars($serviceName) ?></strong> for your pet.</p>
         <!-- On GET, wrap these Bootstrap controls in a working <form>. -->
+        <form method="post" action="booking.php?service=<?= $servicekey ?>">
+            <div class="mb-3">
+                <label class="form-label" for="service">Service</label>
+                <input class="form-control" type="text" id="service" name="service" value="<?= htmlspecialchars($serviceName) ?>" readonly>
+            </div>
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-body p-4">
                 <div class="mb-3">
